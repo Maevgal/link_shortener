@@ -16,5 +16,5 @@ import org.mapstruct.ReportingPolicy;
 public abstract class LinkMapper {
     public abstract Link map(LinkCreateDTO dto);
 
-    //public abstract LinkDTO map(Link model);
+    public abstract LinkDTO map(Link model);
 }
