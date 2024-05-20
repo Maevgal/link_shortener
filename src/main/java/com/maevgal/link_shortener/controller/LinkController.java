@@ -27,6 +27,6 @@ public class LinkController {
     @GetMapping("/{short-url}")
     @ResponseStatus(HttpStatus.FOUND)
     public LinkDTO showShortLink(@PathVariable String shortLink){
-        s
+        return null;
     }
 }
