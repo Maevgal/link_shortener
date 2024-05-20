@@ -2,7 +2,6 @@ package com.maevgal.link_shortener.service;
 
 import com.maevgal.link_shortener.dto.LinkCreateDTO;
 import com.maevgal.link_shortener.dto.LinkDTO;
-import com.maevgal.link_shortener.exeption.ResourceNotFoundException;
 import com.maevgal.link_shortener.mapper.LinkMapper;
 import com.maevgal.link_shortener.model.Link;
 import com.maevgal.link_shortener.repository.LinkRepository;
