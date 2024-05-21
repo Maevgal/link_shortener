@@ -15,10 +15,11 @@ public class LinkService {
     private final LinkMapper mapper;
     private final ShortLinkService shortLinkService;
 
-    public void createLink(LinkCreateDTO linkCreateDTO) {
+    public LinkDTO createLink(LinkCreateDTO linkCreateDTO) {
         Link link = mapper.map(linkCreateDTO);
         link.setShortLink(shortLinkService.createShortLink(linkCreateDTO.getLink()));
         repository.save(link);
+        return mapper.map(link);
     }
 
     public void findLinkByShortLink(String shortLink) {

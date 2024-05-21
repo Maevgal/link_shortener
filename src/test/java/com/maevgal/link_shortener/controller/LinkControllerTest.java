@@ -2,6 +2,7 @@ package com.maevgal.link_shortener.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maevgal.link_shortener.dto.LinkCreateDTO;
+import com.maevgal.link_shortener.dto.LinkDTO;
 import com.maevgal.link_shortener.service.LinkService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -42,7 +44,13 @@ public class LinkControllerTest {
                 .content(om.writeValueAsString(testLinkDto));
 
         mockMvc.perform(request)
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(content().json("""
+                        {
+                          "link": "http://some-link",
+                          "shortLink": "/somelink"
+                        }
+                        """));
 
         Mockito.verify(linkService).createLink(testLinkDto);
     }
