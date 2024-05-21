@@ -15,15 +15,18 @@ public class LinkService {
     private final LinkMapper mapper;
     private final ShortLinkService shortLinkService;
 
-    public void createLink(LinkCreateDTO linkCreateDTO) {
+    public LinkDTO createLink(LinkCreateDTO linkCreateDTO) {
         Link link = mapper.map(linkCreateDTO);
         link.setShortLink(shortLinkService.createShortLink(linkCreateDTO.getLink()));
         repository.save(link);
+        return mapper.map(link);
     }
 
-    public void findLinkByShortLink(String shortLink) {
-        Link link = repository.findByLink(shortLink).get();
+    public String findLinkByShortLink(String shortLink) {
+        Link link = repository.findByShortLink(shortLink)
+                .orElseThrow(()->new RuntimeException("Not found short link "+ shortLink));
         LinkDTO linkDTO = mapper.map(link);
+        return linkDTO.getLink();
     }
 
 }

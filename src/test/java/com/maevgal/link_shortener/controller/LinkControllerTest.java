@@ -2,6 +2,9 @@ package com.maevgal.link_shortener.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maevgal.link_shortener.dto.LinkCreateDTO;
+import com.maevgal.link_shortener.dto.LinkDTO;
+import com.maevgal.link_shortener.dto.LinkModelDTO;
+import com.maevgal.link_shortener.model.Link;
 import com.maevgal.link_shortener.service.LinkService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 
+import static java.nio.file.Paths.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -26,37 +32,56 @@ public class LinkControllerTest {
 
     @MockBean
     private LinkService linkService;
-    private LinkCreateDTO testLinkDto;
+    private LinkCreateDTO testLinkCreateDto;
+    private LinkDTO testLinkDTO;
 
     @BeforeEach
     public void setUp() {
-        testLinkDto = new LinkCreateDTO();
-        testLinkDto.setLink("https://for-each.dev/lessons/b/-spring-boot-testing");
-        //testLink.setShortLink("short_link");
+        testLinkCreateDto = new LinkCreateDTO();
+        testLinkCreateDto.setLink("https://for-each.dev/lessons/b/-spring-boot-testing");
+        testLinkDTO = new LinkDTO();
+        testLinkDTO.setLink("http://some-link");
+        testLinkDTO.setShortLink("/somelink");
     }
 
     @Test
     public void testCreateLink_shouldReturn201() throws Exception {
         var request = post("/links")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(testLinkDto));
-
+                .content(om.writeValueAsString(testLinkCreateDto));
+        LinkDTO linkDTO = new LinkDTO();
+        linkDTO.setLink("http://some-link");
+        linkDTO.setShortLink("/somelink");
+        Mockito.when(linkService.createLink(testLinkCreateDto)).thenReturn(linkDTO);
         mockMvc.perform(request)
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(content().json("""
+                        {
+                          "link": "http://some-link",
+                          "shortLink": "/somelink"
+                        }
+                        """));
 
-        Mockito.verify(linkService).createLink(testLinkDto);
+        Mockito.verify(linkService).createLink(testLinkCreateDto);
     }
 
     @Test
     public void testCreateLink_shouldReturn400WhenLinkIsNull() throws Exception {
-        testLinkDto.setLink(null);
+        testLinkCreateDto.setLink(null);
         var request = post("/links")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(testLinkDto));
+                .content(om.writeValueAsString(testLinkCreateDto));
 
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest());
 
         Mockito.verifyNoInteractions(linkService);
     }
+
+    @Test
+    public void testShowShortLink() throws Exception {
+        mockMvc.perform((RequestBuilder) get("/somelink"))
+                .andExpect(status().isFound());
+    }
+
 }
