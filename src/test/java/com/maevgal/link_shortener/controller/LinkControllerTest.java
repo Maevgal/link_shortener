@@ -3,8 +3,6 @@ package com.maevgal.link_shortener.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maevgal.link_shortener.dto.LinkCreateDTO;
 import com.maevgal.link_shortener.dto.LinkDTO;
-import com.maevgal.link_shortener.dto.LinkModelDTO;
-import com.maevgal.link_shortener.model.Link;
 import com.maevgal.link_shortener.service.LinkService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
 
-import static java.nio.file.Paths.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -80,8 +78,19 @@ public class LinkControllerTest {
 
     @Test
     public void testShowShortLink() throws Exception {
-        mockMvc.perform((RequestBuilder) get("/somelink"))
-                .andExpect(status().isFound());
+        Mockito.when(linkService.findLinkByShortLink("somelink")).thenReturn("http://some-link");
+        mockMvc.perform(get("/somelink"))
+                .andExpect(status().isFound())
+                .andExpect(header().string("Location", "http://some-link"));
     }
+
+/*    @Test
+    public void testShowShortLink_shouldReturn404WhenShortLinkIsEmpty() throws Exception {
+        Mockito.when(linkService.findLinkByShortLink("somelink")).thenReturn(null);
+        mockMvc.perform(get("/somelink"))
+                .andExpect(status().isNotFound());
+    }*/
+
+
 
 }
