@@ -22,9 +22,11 @@ public class LinkService {
         return mapper.map(link);
     }
 
-    public void findLinkByShortLink(String shortLink) {
-        Link link = repository.findByLink(shortLink).get();
+    public String findLinkByShortLink(String shortLink) {
+        Link link = repository.findByShortLink(shortLink)
+                .orElseThrow(()->new RuntimeException("Not found short link "+ shortLink));
         LinkDTO linkDTO = mapper.map(link);
+        return linkDTO.getLink();
     }
 
 }
