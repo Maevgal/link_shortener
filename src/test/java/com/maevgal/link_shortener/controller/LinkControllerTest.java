@@ -43,6 +43,11 @@ public class LinkControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(testLinkDto));
 
+        LinkDTO linkDTO = new LinkDTO();
+        linkDTO.setLink("http://some-link");
+        linkDTO.setShortLink("/somelink");
+        Mockito.when(linkService.createLink(testLinkDto)).thenReturn(linkDTO);
+
         mockMvc.perform(request)
                 .andExpect(status().isCreated())
                 .andExpect(content().json("""
