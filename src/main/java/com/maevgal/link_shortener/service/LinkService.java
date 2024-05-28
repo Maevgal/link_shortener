@@ -24,9 +24,9 @@ public class LinkService {
 
     public String findLinkByShortLink(String shortLink) {
         Link link = repository.findByShortLink(shortLink)
-                .orElseThrow(()->new RuntimeException("Not found short link "+ shortLink));
-        LinkDTO linkDTO = mapper.map(link);
-        return linkDTO.getLink();
+                .orElseThrow(() -> new RuntimeException("Not found short link " + shortLink));
+        link.setCount(link.getCount() + 1);
+        repository.save(link);
+        return link.getLink();
     }
-
 }

@@ -4,9 +4,14 @@ import com.maevgal.link_shortener.dto.LinkCreateDTO;
 import com.maevgal.link_shortener.mapper.LinkMapper;
 import com.maevgal.link_shortener.model.Link;
 import com.maevgal.link_shortener.repository.LinkRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LinkServiceTest {
 
@@ -18,7 +23,7 @@ class LinkServiceTest {
 
     @BeforeEach
     void setUp() {
-        linkService = new LinkService(linkRepository, linkMapper,shortLinkService);
+        linkService = new LinkService(linkRepository, linkMapper, shortLinkService);
     }
 
     @Test
@@ -38,5 +43,34 @@ class LinkServiceTest {
 
         linkService.createLink(testLinkDto);
         Mockito.verify(linkRepository).save(expected);
+    }
+
+    @Test
+    void findLinkByShortLink() {
+        String url = "http://some-link";
+        String shortLink = "somelink";
+        Link link = new Link();
+        link.setShortLink(shortLink);
+        link.setLink(url);
+        link.setCount(0);
+
+        Link expected = new Link();
+        expected.setShortLink(shortLink);
+        expected.setLink(url);
+        expected.setCount(1);
+
+        Mockito.when(linkRepository.findByShortLink(shortLink)).thenReturn(Optional.of(link));
+        Assertions.assertThat(linkService.findLinkByShortLink(shortLink)).isEqualTo(url);
+        Mockito.verify(linkRepository).save(expected);
+    }
+
+    @Test
+    void FindLinkByShortLink_shouldThrowException_whenShortLinkNotFound() {
+        String shortLink = "somelink";
+
+        Mockito.when(linkRepository.findByShortLink(shortLink)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> linkService.findLinkByShortLink(shortLink))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Not found short link somelink");
     }
 }
