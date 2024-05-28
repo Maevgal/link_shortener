@@ -2,7 +2,9 @@ package com.maevgal.link_shortener.controller;
 
 import com.maevgal.link_shortener.dto.LinkCreateDTO;
 import com.maevgal.link_shortener.dto.LinkDTO;
+import com.maevgal.link_shortener.dto.LinkStatsDTO;
 import com.maevgal.link_shortener.service.LinkService;
+import com.maevgal.link_shortener.service.LinkStatsService;
 import com.maevgal.link_shortener.service.ShortLinkService;
 import jakarta.validation.Valid;
 import lombok.Data;
@@ -16,12 +18,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Data
 public class LinkController {
     private final LinkService service;
     private final ShortLinkService shortLinkService;
+    private final LinkStatsService linkStatsService;
 
     @PostMapping("/links")
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,5 +41,10 @@ public class LinkController {
         return ResponseEntity.status(302)
                 .header("Location", url)
                 .build();
+    }
+
+    @GetMapping("/stats")
+    public List<LinkStatsDTO> showStats() {
+        return linkStatsService.showStats();
     }
 }
