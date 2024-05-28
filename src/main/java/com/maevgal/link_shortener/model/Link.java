@@ -21,7 +21,7 @@ public class Link {
     private Long id;
     @Column(unique = true)
     private String link;
-    @Column(unique = true)
+    @Column(unique = true, name = "short_link")
     private String shortLink;
     private int count;
 }
