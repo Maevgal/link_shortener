@@ -15,7 +15,6 @@ public interface LinkRepository extends CrudRepository<Link, Long> {
 
     Optional<Link> findByShortLink(String shortLink);
 
-
     @Query(value = "SELECT new com.maevgal.link_shortener.model.LinkStatistic(link, shortLink, count, ROW_NUMBER() OVER(ORDER BY count ASC)) " +
             "FROM Link ORDER BY count")
     List<LinkStatistic> findAllStatisticByLink();
