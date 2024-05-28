@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maevgal.link_shortener.dto.LinkCreateDTO;
 import com.maevgal.link_shortener.dto.LinkDTO;
 import com.maevgal.link_shortener.dto.LinkStatsDTO;
+import com.maevgal.link_shortener.exception.ResourceNotFoundException;
 import com.maevgal.link_shortener.service.LinkService;
 import com.maevgal.link_shortener.service.LinkStatsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,12 +114,11 @@ public class LinkControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
-/*    @Test
+    @Test
     public void testShowShortLink_shouldReturn404WhenShortLinkIsEmpty() throws Exception {
-        Mockito.when(linkService.findLinkByShortLink("somelink")).thenReturn(null);
+        Mockito.when(linkService.findLinkByShortLink("somelink"))
+                .thenThrow(new ResourceNotFoundException("Not found short link somelink"));
         mockMvc.perform(get("/somelink"))
                 .andExpect(status().isNotFound());
-    }*/
-
-
+    }
 }

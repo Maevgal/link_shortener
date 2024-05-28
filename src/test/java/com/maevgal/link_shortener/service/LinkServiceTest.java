@@ -1,6 +1,7 @@
 package com.maevgal.link_shortener.service;
 
 import com.maevgal.link_shortener.dto.LinkCreateDTO;
+import com.maevgal.link_shortener.dto.LinkDTO;
 import com.maevgal.link_shortener.mapper.LinkMapper;
 import com.maevgal.link_shortener.model.Link;
 import com.maevgal.link_shortener.repository.LinkRepository;
@@ -27,22 +28,54 @@ class LinkServiceTest {
     }
 
     @Test
-    void createLink() {
+    void createLink_shouldCreateLink_whenLinkNotExistInDB() {
         String url = "https://for-each.dev/lessons/b/-spring-boot-testing";
         LinkCreateDTO testLinkDto = new LinkCreateDTO();
         testLinkDto.setLink(url);
         Link link = new Link();
         link.setLink(url);
 
-        Link expected = new Link();
-        expected.setLink(url);
-        expected.setShortLink("123");
+        Link expectedEntity = new Link();
+        expectedEntity.setLink(url);
+        expectedEntity.setShortLink("123");
+
+        LinkDTO expectedDto = new LinkDTO();
+        expectedDto.setLink(url);
+        expectedDto.setShortLink("123");
 
         Mockito.when(linkMapper.map(testLinkDto)).thenReturn(link);
+        Mockito.when(linkRepository.findByLink(url)).thenReturn(Optional.empty());
+        Mockito.when(linkMapper.map(expectedEntity)).thenReturn(expectedDto);
         Mockito.when(shortLinkService.createShortLink(url)).thenReturn("123");
 
-        linkService.createLink(testLinkDto);
-        Mockito.verify(linkRepository).save(expected);
+        LinkDTO actual = linkService.createLink(testLinkDto);
+        Mockito.verify(linkRepository).save(expectedEntity);
+        Assertions.assertThat(actual).isEqualTo(expectedDto);
+    }
+
+    @Test
+    void createLink_shouldNotCreateLink_whenLinkExistInDB() {
+        String url = "https://for-each.dev/lessons/b/-spring-boot-testing";
+        LinkCreateDTO testLinkDto = new LinkCreateDTO();
+        testLinkDto.setLink(url);
+        Link link = new Link();
+        link.setLink(url);
+
+        Link selectedLink = new Link();
+        selectedLink.setLink(url);
+        selectedLink.setShortLink("123");
+
+        LinkDTO expectedDto = new LinkDTO();
+        expectedDto.setLink(url);
+        expectedDto.setShortLink("123");
+
+        Mockito.when(linkRepository.findByLink(url)).thenReturn(Optional.of(selectedLink));
+        Mockito.when(linkMapper.map(selectedLink)).thenReturn(expectedDto);
+
+        //test
+        Assertions.assertThat(linkService.createLink(testLinkDto)).isEqualTo(expectedDto);
+        Mockito.verify(linkRepository).findByLink(url);
+        Mockito.verifyNoMoreInteractions(linkRepository);
     }
 
     @Test
